@@ -11,10 +11,10 @@ def smoothing(data, num=100):
 
 path = sys.argv[1]
 with open(path, 'r', encoding='shift_jis') as f:
-    raw_data = list(csv.reader(f))[28:]
-
+    raw_data = list(csv.reader(f))
+print(raw_data[0:5])
 time = np.array([float(l[0]) for l in raw_data])
-CH = [np.array([float(l[i]) for l in raw_data]) for i in range(1, 5)]
+CH = [np.array([float(l[i]) for l in raw_data]) for i in range(1, -1)]
 
 # 添加時間の自動検出
 # スムージングし2次微分
@@ -33,12 +33,16 @@ else:
     idx_start = 600
     idx_stop = 600
 
+"""
 # 添加直後からの差分を取る
 start_time = [np.argmin(d[idx_start:-idx_stop]) + idx_start for d in grad2_CH]
 CH_mod = [d[s:]-d[s] for (d, s) in zip(CH, start_time)]
 m = np.min([len(d) for d in CH_mod])
 CH_mod = [d[:m] for d in CH_mod]
 time = time[:len(CH_mod[0])]-1
+"""
+
+CH_mod = CH
 
 # 補正
 # '''
@@ -61,7 +65,7 @@ tau = [curve_fit(lambda t, tau: dF_max*(1-np.exp(-t/tau)), time, d)[0][0] for (d
 print(tau)
 
 # CSV書き出し
-out = [['', 'CH1', 'CH2', 'CH3', 'CH4']]
+### out = [['', 'CH1', 'CH2', 'CH3', 'CH4']]
 out.append(['tau'] + tau)
 out.append(['', '', '', '', ''])
 
